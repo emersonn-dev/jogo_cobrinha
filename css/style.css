@@ -6,7 +6,7 @@
   font-family: "Press Start 2P", monospace;
 }
 
-/* === Fundo === */
+/* === Fundo geral === */
 body {
   background-color: #000;
   color: #fff;
@@ -16,6 +16,58 @@ body {
   flex-direction: column;
   min-height: 100vh;
   text-align: center;
+  overflow: hidden; /* evita rolagem no celular */
+}
+
+/* === Títulos === */
+h1, h2, h3 {
+  text-shadow: 0 0 10px #00ff99;
+  margin-bottom: 10px;
+}
+
+/* === Botões === */
+button {
+  background-color: #e74c3c;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  margin-top: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+button:hover {
+  background-color: #ff6f61;
+  transform: scale(1.05);
+}
+
+/* === Inputs e selects === */
+input, select {
+  background-color: #111;
+  color: #fff;
+  border: 2px solid #00ff99;
+  border-radius: 5px;
+  padding: 8px;
+  margin-top: 5px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  text-align: center;
+}
+
+/* === Menu inicial === */
+#menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid #00ff99;
+  border-radius: 10px;
+  box-shadow: 0 0 20px #00ff99;
 }
 
 /* === Canvas (área do jogo) === */
@@ -25,4 +77,62 @@ canvas {
   background-color: #111;
   margin: 20px 0;
   touch-action: none; /* bloqueia gestos nativos */
+}
+
+/* === HUD === */
+#hud {
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+/* === Game Over === */
+#gameOver {
+  display: none;
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 2px solid #e74c3c;
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 15px;
+  box-shadow: 0 0 15px #e74c3c;
+}
+
+/* === Ranking === */
+#ranking {
+  margin-top: 15px;
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 2px solid #00ff99;
+  border-radius: 10px;
+  padding: 10px;
+  width: 90%;
+  max-width: 350px;
+  box-shadow: 0 0 20px #00ff99;
+}
+
+#ranking ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#ranking li {
+  margin: 5px 0;
+  font-size: 10px;
+}
+
+/* === Responsividade === */
+@media (max-width: 600px) {
+  body {
+    font-size: 10px;
+    padding: 10px;
+  }
+
+  button, input, select {
+    font-size: 9px;
+    padding: 8px;
+  }
+
+  canvas {
+    width: 90vw;
+    height: 90vw;
+  }
 }
