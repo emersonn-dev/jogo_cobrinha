@@ -1,0 +1,156 @@
+body {
+  background: radial-gradient(circle at center, #101010 0%, #000000 80%);
+  color: #fff;
+  font-family: "Press Start 2P", monospace;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  overflow-x: hidden;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px #4caf50;
+}
+
+canvas {
+  background: #111;
+  border: 3px solid #4caf50;
+  box-shadow: 0 0 20px #4caf50;
+  image-rendering: pixelated;
+}
+
+/* MENU */
+#menu {
+  text-align: center;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px #4caf50;
+}
+
+#menu label, #menu select, #menu input {
+  display: block;
+  margin: 10px auto;
+}
+
+#menu input, #menu select {
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  width: 200px;
+  text-align: center;
+  font-family: "Press Start 2P", monospace;
+  font-size: 12px;
+  background: #222;
+  color: #fff;
+}
+
+#menu button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  border: none;
+  background: #4caf50;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 12px;
+}
+
+#menu button:hover {
+  transform: scale(1.1);
+  background: #66bb6a;
+}
+
+#hud {
+  display: flex;
+  justify-content: space-between;
+  width: 400px;
+  margin-top: 10px;
+  font-size: 10px;
+}
+
+#ranking {
+  margin-top: 20px;
+  background: #1e1e1e;
+  padding: 10px 20px;
+  border-radius: 10px;
+  width: 260px;
+  text-align: center;
+  box-shadow: 0 0 10px #4caf50;
+}
+
+#ranking ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#ranking li {
+  padding: 4px 0;
+  color: #ccc;
+  font-size: 10px;
+}
+
+#gameOver {
+  display: none;
+  text-align: center;
+  margin-top: 15px;
+}
+
+#gameOver button {
+  margin-top: 10px;
+  background: #e53935;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#gameOver button:hover {
+  transform: scale(1.1);
+  background: #ff5252;
+}
+
+/* 📱 Responsividade */
+@media (max-width: 600px) {
+  canvas {
+    width: 90vw;
+    height: 90vw;
+  }
+
+  canvas {
+  touch-action: none;
+  }
+
+  #hud {
+    width: 90vw;
+    flex-direction: column;
+    align-items: center;
+    font-size: 10px;
+  }
+
+  #ranking {
+    width: 80vw;
+    font-size: 9px;
+  }
+
+  #menu {
+    width: 90vw;
+  }
+
+  h1 {
+    font-size: 12px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 12px 24px;
+  }
+}

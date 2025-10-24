@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🐍 Jogo da Cobrinha Deluxe</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- MENU -->
+  <div id="menu">
+    <h1>🐍 Jogo da Cobrinha Deluxe</h1>
+
+    <label>Seu nome:</label>
+    <input type="text" id="nomeJogador" placeholder="Digite seu nome..." maxlength="20">
+
+    <label>Som:</label>
+    <select id="somOption">
+      <option value="on" selected>Ativado 🔊</option>
+      <option value="off">Desativado 🔇</option>
+    </select>
+
+    <button id="startBtn">🎮 Jogar</button>
+  </div>
+
+  <!-- JOGO -->
+  <div id="gameContainer" style="display:none;">
+    <h1 id="tituloJogo">🐍 Cobrinha Deluxe</h1>
+    <canvas id="game"></canvas>
+
+    <div id="hud">
+      <p id="infoJogador"></p>
+      <p id="recordeAtual"></p>
+    </div>
+
+    <div id="gameOver">
+      <h2>💀 Game Over!</h2>
+      <p id="pontuacaoFinal"></p>
+      <button id="retry">🔁 Tentar novamente</button>
+    </div>
+
+    <div id="ranking">
+      <h3>🏆 Ranking</h3>
+      <ol id="listaRanking"></ol>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
