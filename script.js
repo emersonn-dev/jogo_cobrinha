@@ -12,7 +12,7 @@ const rankingList = document.getElementById("listaRanking");
 const gameOverDiv = document.getElementById("gameOver");
 const pontuacaoFinal = document.getElementById("pontuacaoFinal");
 
-// 🔄 Ajusta o tamanho do canvas conforme tela
+// 🔄 Ajusta o tamanho do canvas conforme a tela
 function ajustarCanvas() {
   const tamanho = Math.min(window.innerWidth * 0.9, 400);
   canvas.width = tamanho;
@@ -21,7 +21,7 @@ function ajustarCanvas() {
 ajustarCanvas();
 window.addEventListener("resize", ajustarCanvas);
 
-// Variáveis do jogo
+// Variáveis principais
 let somComer, somMorte, somBonus;
 let somAtivo = true;
 let jogador = "";
@@ -30,7 +30,7 @@ let score = 0;
 let snake = [];
 let d;
 let food;
-let velocidade = 250; // começa bem devagar
+let velocidade = 250; // começa devagar
 let game;
 
 // 🎮 Iniciar o jogo
@@ -38,7 +38,6 @@ startBtn.addEventListener("click", () => {
   jogador = nomeInput.value.trim() || "Anônimo";
   somAtivo = somSelect.value === "on";
 
-  // carrega os sons após o clique (evita bloqueio do navegador)
   somComer = new Audio("audio/eat.mp3");
   somMorte = new Audio("audio/die.mp3");
   somBonus = new Audio("audio/levelup.mp3");
@@ -72,7 +71,6 @@ function gerarComida() {
   };
 }
 
-
 function resetarJogo() {
   snake = [{ x: 10 * box, y: 10 * box }];
   score = 0;
@@ -90,13 +88,7 @@ function draw() {
     if (i === 0) {
       ctx.fillStyle = "#2ecc71";
       ctx.beginPath();
-      ctx.arc(
-        snake[i].x + box / 2,
-        snake[i].y + box / 2,
-        box / 2,
-        0,
-        Math.PI * 2
-      );
+      ctx.arc(snake[i].x + box / 2, snake[i].y + box / 2, box / 2, 0, Math.PI * 2);
       ctx.fill();
 
       // olhos
@@ -119,7 +111,7 @@ function draw() {
     }
   }
 
-  // comida
+  // desenha comida
   ctx.fillStyle = "#e74c3c";
   ctx.beginPath();
   ctx.arc(food.x + box / 2, food.y + box / 2, box / 2, 0, Math.PI * 2);
@@ -142,9 +134,9 @@ function draw() {
       somComer.play();
     }
 
-    // 🔺 aumenta a velocidade a cada 10 pontos
+    // aumenta velocidade a cada 10 pontos
     if (score % 10 === 0) {
-      velocidade *= 0.99; // 1% mais rápido
+      velocidade *= 0.99;
       clearInterval(game);
       game = setInterval(draw, velocidade);
       if (somAtivo) {
@@ -237,7 +229,7 @@ function flashCanvas() {
   }, 200);
 }
 
-// 📱 Controles por toque (gestos de deslizar)
+// 📱 Controles por toque (qualquer lugar da tela)
 let startX = 0;
 let startY = 0;
 
@@ -254,21 +246,15 @@ document.addEventListener("touchmove", function (e) {
   const diffX = touch.clientX - startX;
   const diffY = touch.clientY - startY;
 
-  // deslizar horizontal
   if (Math.abs(diffX) > Math.abs(diffY)) {
     if (diffX > 0 && d !== "LEFT") d = "RIGHT";
     else if (diffX < 0 && d !== "RIGHT") d = "LEFT";
   } else {
-    // deslizar vertical
     if (diffY > 0 && d !== "UP") d = "DOWN";
     else if (diffY < 0 && d !== "DOWN") d = "UP";
   }
 
-  // reseta o início do toque
   startX = 0;
   startY = 0;
-
-  e.preventDefault(); // evita rolagem da tela
+  e.preventDefault(); // evita scroll
 });
-
-
