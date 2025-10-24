@@ -241,13 +241,13 @@ function flashCanvas() {
 let startX = 0;
 let startY = 0;
 
-canvas.addEventListener("touchstart", function (e) {
+document.addEventListener("touchstart", function (e) {
   const touch = e.touches[0];
   startX = touch.clientX;
   startY = touch.clientY;
 });
 
-canvas.addEventListener("touchmove", function (e) {
+document.addEventListener("touchmove", function (e) {
   if (!startX || !startY) return;
 
   const touch = e.touches[0];
@@ -270,4 +270,5 @@ canvas.addEventListener("touchmove", function (e) {
 
   e.preventDefault(); // evita rolagem da tela
 });
+
 
