@@ -64,11 +64,14 @@ function direction(e) {
 }
 
 function gerarComida() {
+  const maxX = Math.floor(canvas.width / box);
+  const maxY = Math.floor(canvas.height / box);
   return {
-    x: Math.floor(Math.random() * 20) * box,
-    y: Math.floor(Math.random() * 20) * box
+    x: Math.floor(Math.random() * maxX) * box,
+    y: Math.floor(Math.random() * maxY) * box
   };
 }
+
 
 function resetarJogo() {
   snake = [{ x: 10 * box, y: 10 * box }];
@@ -267,3 +270,4 @@ canvas.addEventListener("touchmove", function (e) {
 
   e.preventDefault(); // evita rolagem da tela
 });
+
