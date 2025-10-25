@@ -27,34 +27,37 @@ h1, h2, h3 {
 
 /* === Botões === */
 button {
-  background-color: #e74c3c;
+  background-color: #00ff99;
   border: none;
-  color: white;
+  color: #000;
   padding: 10px 20px;
   margin-top: 10px;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 6px;
   font-family: "Press Start 2P", monospace;
   font-size: 10px;
-  transition: background-color 0.2s, transform 0.1s;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 0 10px #00ff99;
 }
 
 button:hover {
-  background-color: #ff6f61;
+  background-color: #00cc7a;
   transform: scale(1.05);
+  box-shadow: 0 0 15px #00ff99;
 }
 
 /* === Inputs e selects === */
 input, select {
   background-color: #111;
-  color: #fff;
+  color: #00ff99;
   border: 2px solid #00ff99;
-  border-radius: 5px;
+  border-radius: 6px;
   padding: 8px;
   margin-top: 5px;
   font-family: "Press Start 2P", monospace;
   font-size: 10px;
   text-align: center;
+  box-shadow: 0 0 10px #00ff99;
 }
 
 /* === Menu inicial === */
@@ -64,10 +67,12 @@ input, select {
   align-items: center;
   gap: 10px;
   padding: 20px;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.8);
   border: 2px solid #00ff99;
-  border-radius: 10px;
+  border-radius: 12px;
   box-shadow: 0 0 20px #00ff99;
+  width: 90%;
+  max-width: 400px;
 }
 
 /* === Canvas (área do jogo) === */
@@ -81,8 +86,10 @@ canvas {
 
 /* === HUD === */
 #hud {
-  font-size: 12px;
+  font-size: 11px;
   margin-bottom: 10px;
+  color: #00ff99;
+  text-shadow: 0 0 8px #00ff99;
 }
 
 /* === Game Over === */
@@ -90,10 +97,12 @@ canvas {
   display: none;
   background-color: rgba(0, 0, 0, 0.8);
   border: 2px solid #e74c3c;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 15px;
   margin-top: 15px;
   box-shadow: 0 0 15px #e74c3c;
+  width: 90%;
+  max-width: 400px;
 }
 
 /* === Ranking === */
@@ -101,7 +110,7 @@ canvas {
   margin-top: 15px;
   background-color: rgba(0, 0, 0, 0.8);
   border: 2px solid #00ff99;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 10px;
   width: 90%;
   max-width: 350px;
@@ -117,6 +126,20 @@ canvas {
 #ranking li {
   margin: 5px 0;
   font-size: 10px;
+  color: #00ff99;
+  text-shadow: 0 0 8px #00ff99;
+}
+
+/* === Botão de voltar ao menu === */
+#retry {
+  background-color: #e74c3c;
+  color: #fff;
+  box-shadow: 0 0 10px #e74c3c;
+}
+
+#retry:hover {
+  background-color: #ff6b6b;
+  box-shadow: 0 0 15px #ff6b6b;
 }
 
 /* === Responsividade === */
@@ -134,5 +157,9 @@ canvas {
   canvas {
     width: 90vw;
     height: 90vw;
+  }
+
+  #menu, #ranking, #gameOver {
+    width: 95%;
   }
 }
