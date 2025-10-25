@@ -1,6 +1,15 @@
 // === Firebase ===
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-import { getDatabase, ref, push, set, get, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+import {
+  getDatabase,
+  ref,
+  push,
+  set,
+  get,
+  query,
+  orderByChild,
+  limitToLast,
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
 // Configuração Firebase
 const firebaseConfig = {
@@ -10,7 +19,7 @@ const firebaseConfig = {
   projectId: "jogo-cobrinha-23a5a",
   storageBucket: "jogo-cobrinha-23a5a.firebasestorage.app",
   messagingSenderId: "894615929117",
-  appId: "1:894615929117:web:a52c4cc21ed385a22ea1f4"
+  appId: "1:894615929117:web:a52c4cc21ed385a22ea1f4",
 };
 
 const app = initializeApp(firebaseConfig);
@@ -28,14 +37,12 @@ const showRankingBtn = document.getElementById("showRankingBtn");
 const menu = document.getElementById("menu");
 const gameContainer = document.getElementById("gameContainer");
 const infoJogador = document.getElementById("infoJogador");
-const recordeAtual = document.getElementById("recordeAtual");
 const rankingList = document.getElementById("listaRanking");
 const gameOverDiv = document.getElementById("gameOver");
 const pontuacaoFinal = document.getElementById("pontuacaoFinal");
 const voltarMenu = document.getElementById("voltarMenu");
 
-
-// === Config Canvas ===
+// === Canvas Responsivo ===
 function ajustarCanvas() {
   const tamanho = Math.min(window.innerWidth * 0.9, 400);
   canvas.width = tamanho;
@@ -53,10 +60,11 @@ let score = 0;
 let snake = [];
 let d;
 let food;
-let velocidade = 250;
+let velocidadeInicial = 250;
+let velocidade = velocidadeInicial;
 let game;
 
-// === Iniciar Jogo ===
+// === Iniciar o Jogo ===
 startBtn.addEventListener("click", async () => {
   jogador = nomeInput.value.trim() || "Anônimo";
   somAtivo = somSelect.value === "on";
@@ -86,56 +94,53 @@ showRankingBtn.addEventListener("click", async () => {
 });
 
 // === Direções ===
-document.addEventListener("keydown", e => {
+document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowLeft" && d !== "RIGHT") d = "LEFT";
   else if (e.key === "ArrowUp" && d !== "DOWN") d = "UP";
   else if (e.key === "ArrowRight" && d !== "LEFT") d = "RIGHT";
   else if (e.key === "ArrowDown" && d !== "UP") d = "DOWN";
 });
 
-// === Funções ===
+// === Gerar comida ===
 function gerarComida() {
   const maxX = Math.floor(canvas.width / box);
   const maxY = Math.floor(canvas.height / box);
-  return { x: Math.floor(Math.random() * maxX) * box, y: Math.floor(Math.random() * maxY) * box };
+  return {
+    x: Math.floor(Math.random() * maxX) * box,
+    y: Math.floor(Math.random() * maxY) * box,
+  };
 }
 
+// === Resetar Jogo ===
 function resetarJogo() {
   snake = [{ x: 10 * box, y: 10 * box }];
   score = 0;
+  velocidade = velocidadeInicial;
   d = undefined;
   food = gerarComida();
   clearInterval(game);
 }
 
+// === Loop principal do jogo ===
 function draw() {
-  // fundo
   ctx.fillStyle = "#111";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // === desenhar cobrinha ===
+  // desenhar cobra
   for (let i = 0; i < snake.length; i++) {
     if (i === 0) {
-      // cabeça
       ctx.fillStyle = "#2ecc71";
       ctx.beginPath();
-      ctx.arc(
-        snake[i].x + box / 2,
-        snake[i].y + box / 2,
-        box / 2,
-        0,
-        Math.PI * 2
-      );
+      ctx.arc(snake[i].x + box / 2, snake[i].y + box / 2, box / 2, 0, Math.PI * 2);
       ctx.fill();
 
-      // olhos 🐍
+      // olhos
       ctx.fillStyle = "#000";
       ctx.beginPath();
-      ctx.arc(snake[i].x + box * 0.25, snake[i].y + box * 0.25, 2, 0, Math.PI * 2);
-      ctx.arc(snake[i].x + box * 0.75, snake[i].y + box * 0.25, 2, 0, Math.PI * 2);
+      ctx.arc(snake[i].x + 5, snake[i].y + 5, 2, 0, Math.PI * 2);
+      ctx.arc(snake[i].x + 15, snake[i].y + 5, 2, 0, Math.PI * 2);
       ctx.fill();
     } else {
-      // corpo (segmentos arredondados com degradê)
       const grad = ctx.createLinearGradient(
         snake[i].x,
         snake[i].y,
@@ -145,26 +150,18 @@ function draw() {
       grad.addColorStop(0, "#27ae60");
       grad.addColorStop(1, "#145a32");
       ctx.fillStyle = grad;
-
       ctx.beginPath();
-      ctx.arc(
-        snake[i].x + box / 2,
-        snake[i].y + box / 2,
-        box / 2.2,
-        0,
-        Math.PI * 2
-      );
+      ctx.arc(snake[i].x + box / 2, snake[i].y + box / 2, box / 2.2, 0, Math.PI * 2);
       ctx.fill();
     }
   }
 
-  // === desenhar comida ===
+  // desenhar comida
   ctx.fillStyle = "#e74c3c";
   ctx.beginPath();
   ctx.arc(food.x + box / 2, food.y + box / 2, box / 2, 0, Math.PI * 2);
   ctx.fill();
 
-  // movimento da cabeça
   let snakeX = snake[0].x;
   let snakeY = snake[0].y;
 
@@ -173,13 +170,13 @@ function draw() {
   if (d === "RIGHT") snakeX += box;
   if (d === "DOWN") snakeY += box;
 
-  // comer comida
+  // comer
   if (snakeX === food.x && snakeY === food.y) {
     score++;
     food = gerarComida();
     if (somAtivo) somComer.play();
 
-    // aumenta a velocidade a cada 10 pontos
+    // aumenta velocidade a cada 10 pontos (1% mais rápido)
     if (score % 10 === 0) {
       velocidade *= 0.99;
       clearInterval(game);
@@ -193,7 +190,7 @@ function draw() {
 
   const newHead = { x: snakeX, y: snakeY };
 
-  // colisão com bordas ou corpo
+  // colisão
   if (
     snakeX < 0 ||
     snakeY < 0 ||
@@ -211,21 +208,24 @@ function draw() {
   atualizarHUD();
 }
 
+// === Verificações ===
 function collision(head, array) {
-  return array.some(seg => seg.x === head.x && seg.y === head.y);
+  return array.some((seg) => seg.x === head.x && seg.y === head.y);
 }
 
 function atualizarHUD() {
   infoJogador.textContent = `👤 ${jogador} | 🧮 Pontos: ${score}`;
 }
 
-function gameOver() {
+// === Game Over ===
+async function gameOver() {
   pontuacaoFinal.textContent = `${jogador}, sua pontuação foi ${score}!`;
   gameOverDiv.style.display = "block";
-  salvarRankingGlobal(jogador, score).then(() => carregarRankingGlobal());
+  await salvarRankingGlobal(jogador, score);
+  await carregarRankingGlobal();
 }
 
-// === Ranking Global ===
+// === Ranking Firebase ===
 async function salvarRankingGlobal(nome, pontos) {
   const dataAgora = new Date().toLocaleString("pt-BR");
   const rankingRef = ref(db, "ranking");
@@ -238,7 +238,7 @@ async function carregarRankingGlobal() {
   const q = query(rankingRef, orderByChild("pontos"), limitToLast(50));
   const snap = await get(q);
   let lista = [];
-  if (snap.exists()) snap.forEach(c => lista.push(c.val()));
+  if (snap.exists()) snap.forEach((c) => lista.push(c.val()));
   lista.sort((a, b) => b.pontos - a.pontos);
   lista = lista.slice(0, 5);
   rankingList.innerHTML = "";
@@ -249,21 +249,28 @@ async function carregarRankingGlobal() {
   });
 }
 
+// === Botões ===
 retryBtn.addEventListener("click", () => {
   gameOverDiv.style.display = "none";
   resetarJogo();
   game = setInterval(draw, velocidade);
 });
 
-// === Controles por toque ===
+voltarMenu.addEventListener("click", () => {
+  gameContainer.style.display = "none";
+  gameOverDiv.style.display = "none";
+  menu.style.display = "flex";
+});
+
+// === Toque (celular) ===
 let startX = 0;
 let startY = 0;
-document.addEventListener("touchstart", e => {
+document.addEventListener("touchstart", (e) => {
   const touch = e.touches[0];
   startX = touch.clientX;
   startY = touch.clientY;
 });
-document.addEventListener("touchmove", e => {
+document.addEventListener("touchmove", (e) => {
   if (!startX || !startY) return;
   const touch = e.touches[0];
   const diffX = touch.clientX - startX;
@@ -280,8 +287,11 @@ document.addEventListener("touchmove", e => {
   e.preventDefault();
 });
 
-voltarMenu.addEventListener("click", () => {
-  gameContainer.style.display = "none";
-  menu.style.display = "flex";
-});
-
+// === Efeito visual ===
+function flashCanvas() {
+  const oldShadow = canvas.style.boxShadow;
+  canvas.style.boxShadow = "0 0 25px #00ff99";
+  setTimeout(() => {
+    canvas.style.boxShadow = oldShadow;
+  }, 200);
+}
