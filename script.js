@@ -1,9 +1,40 @@
+// === Import Firebase ===
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import {
+  getDatabase,
+  ref,
+  push,
+  set,
+  get,
+  query,
+  orderByChild,
+  limitToLast,
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+// === Configuração do Firebase ===
+const firebaseConfig = {
+  apiKey: "AIzaSyCMC9YrmIcVmm4HNpgzL-E1WTEJVtoY4s4",
+  authDomain: "jogo-cobrinha-23a5a.firebaseapp.com",
+  databaseURL: "https://jogo-cobrinha-23a5a-default-rtdb.firebaseio.com",
+  projectId: "jogo-cobrinha-23a5a",
+  storageBucket: "jogo-cobrinha-23a5a.firebasestorage.app",
+  messagingSenderId: "894615929117",
+  appId: "1:894615929117:web:a52c4cc21ed385a22ea1f4",
+};
+
+// === Inicializar Firebase ===
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+console.log("✅ Firebase conectado!");
+
+// === Seleciona elementos ===
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const startBtn = document.getElementById("startBtn");
 const retryBtn = document.getElementById("retry");
 const nomeInput = document.getElementById("nomeJogador");
 const somSelect = document.getElementById("somOption");
+const showRankingBtn = document.getElementById("showRankingBtn");
 const menu = document.getElementById("menu");
 const gameContainer = document.getElementById("gameContainer");
 const infoJogador = document.getElementById("infoJogador");
@@ -12,7 +43,7 @@ const rankingList = document.getElementById("listaRanking");
 const gameOverDiv = document.getElementById("gameOver");
 const pontuacaoFinal = document.getElementById("pontuacaoFinal");
 
-// 🔄 Ajusta o tamanho do canvas conforme a tela
+// === Ajusta o tamanho do canvas ===
 function ajustarCanvas() {
   const tamanho = Math.min(window.innerWidth * 0.9, 400);
   canvas.width = tamanho;
@@ -21,7 +52,7 @@ function ajustarCanvas() {
 ajustarCanvas();
 window.addEventListener("resize", ajustarCanvas);
 
-// Variáveis principais
+// === Variáveis do jogo ===
 let somComer, somMorte, somBonus;
 let somAtivo = true;
 let jogador = "";
@@ -30,11 +61,11 @@ let score = 0;
 let snake = [];
 let d;
 let food;
-let velocidade = 250; // começa devagar
+let velocidade = 250;
 let game;
 
-// 🎮 Iniciar o jogo
-startBtn.addEventListener("click", () => {
+// === Iniciar o jogo ===
+startBtn.addEventListener("click", async () => {
   jogador = nomeInput.value.trim() || "Anônimo";
   somAtivo = somSelect.value === "on";
 
@@ -48,27 +79,33 @@ startBtn.addEventListener("click", () => {
   gameContainer.style.alignItems = "center";
 
   resetarJogo();
-  mostrarRanking();
+  await carregarRankingGlobal();
   atualizarHUD();
   game = setInterval(draw, velocidade);
 });
 
-document.addEventListener("keydown", direction);
+// === Ver Ranking Global ===
+showRankingBtn.addEventListener("click", async () => {
+  menu.style.display = "none";
+  gameContainer.style.display = "flex";
+  gameContainer.style.flexDirection = "column";
+  gameContainer.style.alignItems = "center";
+  await carregarRankingGlobal();
+});
 
-function direction(e) {
+// === Direção do teclado ===
+document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowLeft" && d !== "RIGHT") d = "LEFT";
   else if (e.key === "ArrowUp" && d !== "DOWN") d = "UP";
   else if (e.key === "ArrowRight" && d !== "LEFT") d = "RIGHT";
   else if (e.key === "ArrowDown" && d !== "UP") d = "DOWN";
-}
+});
 
+// === Funções auxiliares ===
 function gerarComida() {
   const maxX = Math.floor(canvas.width / box);
   const maxY = Math.floor(canvas.height / box);
-  return {
-    x: Math.floor(Math.random() * maxX) * box,
-    y: Math.floor(Math.random() * maxY) * box
-  };
+  return { x: Math.floor(Math.random() * maxX) * box, y: Math.floor(Math.random() * maxY) * box };
 }
 
 function resetarJogo() {
@@ -79,44 +116,47 @@ function resetarJogo() {
   clearInterval(game);
 }
 
+// === Desenhar jogo ===
 function draw() {
+  // fundo
   ctx.fillStyle = "#111";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // desenha cobra
+  // === desenhar cobrinha ===
   for (let i = 0; i < snake.length; i++) {
     if (i === 0) {
+      // cabeça
       ctx.fillStyle = "#2ecc71";
       ctx.beginPath();
       ctx.arc(snake[i].x + box / 2, snake[i].y + box / 2, box / 2, 0, Math.PI * 2);
       ctx.fill();
 
-      // olhos
+      // olhos 🐍
       ctx.fillStyle = "#000";
       ctx.beginPath();
-      ctx.arc(snake[i].x + 5, snake[i].y + 5, 2, 0, Math.PI * 2);
-      ctx.arc(snake[i].x + 15, snake[i].y + 5, 2, 0, Math.PI * 2);
+      ctx.arc(snake[i].x + box * 0.25, snake[i].y + box * 0.25, 2, 0, Math.PI * 2);
+      ctx.arc(snake[i].x + box * 0.75, snake[i].y + box * 0.25, 2, 0, Math.PI * 2);
       ctx.fill();
     } else {
-      const grad = ctx.createLinearGradient(
-        snake[i].x,
-        snake[i].y,
-        snake[i].x + box,
-        snake[i].y + box
-      );
+      // corpo com gradiente arredondado
+      const grad = ctx.createLinearGradient(snake[i].x, snake[i].y, snake[i].x + box, snake[i].y + box);
       grad.addColorStop(0, "#27ae60");
       grad.addColorStop(1, "#145a32");
       ctx.fillStyle = grad;
-      ctx.fillRect(snake[i].x, snake[i].y, box, box);
+
+      ctx.beginPath();
+      ctx.arc(snake[i].x + box / 2, snake[i].y + box / 2, box / 2.2, 0, Math.PI * 2);
+      ctx.fill();
     }
   }
 
-  // desenha comida
+  // === desenhar comida ===
   ctx.fillStyle = "#e74c3c";
   ctx.beginPath();
   ctx.arc(food.x + box / 2, food.y + box / 2, box / 2, 0, Math.PI * 2);
   ctx.fill();
 
+  // movimento da cabeça
   let snakeX = snake[0].x;
   let snakeY = snake[0].y;
 
@@ -129,27 +169,20 @@ function draw() {
   if (snakeX === food.x && snakeY === food.y) {
     score++;
     food = gerarComida();
-    if (somAtivo) {
-      somComer.currentTime = 0;
-      somComer.play();
-    }
+    if (somAtivo) somComer.play();
 
-    // aumenta velocidade a cada 10 pontos
     if (score % 10 === 0) {
       velocidade *= 0.99;
       clearInterval(game);
       game = setInterval(draw, velocidade);
-      if (somAtivo) {
-        somBonus.currentTime = 0;
-        somBonus.play();
-      }
+      if (somAtivo) somBonus.play();
       flashCanvas();
     }
-  } else {
-    snake.pop();
-  }
+  } else snake.pop();
 
   const newHead = { x: snakeX, y: snakeY };
+
+  // colisão
   if (
     snakeX < 0 ||
     snakeY < 0 ||
@@ -158,10 +191,7 @@ function draw() {
     collision(newHead, snake)
   ) {
     clearInterval(game);
-    if (somAtivo) {
-      somMorte.currentTime = 0;
-      somMorte.play();
-    }
+    if (somAtivo) somMorte.play();
     gameOver();
     return;
   }
@@ -170,54 +200,55 @@ function draw() {
   atualizarHUD();
 }
 
+// === Colisão ===
 function collision(head, array) {
-  return array.some(seg => seg.x === head.x && seg.y === head.y);
+  return array.some((seg) => seg.x === head.x && seg.y === head.y);
 }
 
+// === Atualiza HUD ===
 function atualizarHUD() {
   infoJogador.textContent = `👤 ${jogador} | 🧮 Pontos: ${score}`;
-  const melhor = getMelhorPontuacao(jogador);
-  recordeAtual.textContent = melhor ? `🏅 Recorde: ${melhor} pts` : "";
 }
 
-function getMelhorPontuacao(nome) {
-  const ranking = JSON.parse(localStorage.getItem("rankingSnake")) || [];
-  const player = ranking.find(r => r.nome === nome);
-  return player ? player.pontos : 0;
-}
-
+// === Game Over ===
 function gameOver() {
   pontuacaoFinal.textContent = `${jogador}, sua pontuação foi ${score}!`;
   gameOverDiv.style.display = "block";
-  salvarRanking(jogador, score);
-  mostrarRanking();
+  salvarRankingGlobal(jogador, score).then(() => carregarRankingGlobal());
 }
 
-function salvarRanking(nome, pontos) {
-  const data = new Date().toLocaleString("pt-BR");
-  let ranking = JSON.parse(localStorage.getItem("rankingSnake")) || [];
-  ranking.push({ nome, pontos, data });
-  ranking.sort((a, b) => b.pontos - a.pontos);
-  ranking = ranking.slice(0, 5);
-  localStorage.setItem("rankingSnake", JSON.stringify(ranking));
+// === Ranking Global ===
+async function salvarRankingGlobal(nome, pontos) {
+  const dataAgora = new Date().toLocaleString("pt-BR");
+  const rankingRef = ref(db, "ranking");
+  const novoRef = push(rankingRef);
+  return set(novoRef, { nome, pontos, data: dataAgora });
 }
 
-function mostrarRanking() {
-  const ranking = JSON.parse(localStorage.getItem("rankingSnake")) || [];
+async function carregarRankingGlobal() {
+  const rankingRef = ref(db, "ranking");
+  const q = query(rankingRef, orderByChild("pontos"), limitToLast(50));
+  const snap = await get(q);
+  let lista = [];
+  if (snap.exists()) snap.forEach((c) => lista.push(c.val()));
+  lista.sort((a, b) => b.pontos - a.pontos);
+  lista = lista.slice(0, 5);
   rankingList.innerHTML = "";
-  ranking.forEach((r, i) => {
+  lista.forEach((r, i) => {
     const li = document.createElement("li");
     li.textContent = `${i + 1}. ${r.nome} - ${r.pontos} pts (${r.data})`;
     rankingList.appendChild(li);
   });
 }
 
+// === Reiniciar ===
 retryBtn.addEventListener("click", () => {
   gameOverDiv.style.display = "none";
   resetarJogo();
   game = setInterval(draw, velocidade);
 });
 
+// === Flash de velocidade ===
 function flashCanvas() {
   const oldShadow = canvas.style.boxShadow;
   const oldBorder = canvas.style.borderColor;
@@ -229,23 +260,18 @@ function flashCanvas() {
   }, 200);
 }
 
-// 📱 Controles por toque (qualquer lugar da tela)
-let startX = 0;
-let startY = 0;
-
-document.addEventListener("touchstart", function (e) {
+// === Controle por toque ===
+let startX = 0, startY = 0;
+document.addEventListener("touchstart", (e) => {
   const touch = e.touches[0];
   startX = touch.clientX;
   startY = touch.clientY;
 });
-
-document.addEventListener("touchmove", function (e) {
+document.addEventListener("touchmove", (e) => {
   if (!startX || !startY) return;
-
   const touch = e.touches[0];
   const diffX = touch.clientX - startX;
   const diffY = touch.clientY - startY;
-
   if (Math.abs(diffX) > Math.abs(diffY)) {
     if (diffX > 0 && d !== "LEFT") d = "RIGHT";
     else if (diffX < 0 && d !== "RIGHT") d = "LEFT";
@@ -253,8 +279,7 @@ document.addEventListener("touchmove", function (e) {
     if (diffY > 0 && d !== "UP") d = "DOWN";
     else if (diffY < 0 && d !== "DOWN") d = "UP";
   }
-
   startX = 0;
   startY = 0;
-  e.preventDefault(); // evita scroll
+  e.preventDefault();
 });
