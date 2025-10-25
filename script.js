@@ -1,17 +1,8 @@
-// === Import Firebase ===
+// === Firebase ===
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-import {
-  getDatabase,
-  ref,
-  push,
-  set,
-  get,
-  query,
-  orderByChild,
-  limitToLast,
-} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+import { getDatabase, ref, push, set, get, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
-// === Configuração do Firebase ===
+// Configuração Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCMC9YrmIcVmm4HNpgzL-E1WTEJVtoY4s4",
   authDomain: "jogo-cobrinha-23a5a.firebaseapp.com",
@@ -19,15 +10,14 @@ const firebaseConfig = {
   projectId: "jogo-cobrinha-23a5a",
   storageBucket: "jogo-cobrinha-23a5a.firebasestorage.app",
   messagingSenderId: "894615929117",
-  appId: "1:894615929117:web:a52c4cc21ed385a22ea1f4",
+  appId: "1:894615929117:web:a52c4cc21ed385a22ea1f4"
 };
 
-// === Inicializar Firebase ===
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 console.log("✅ Firebase conectado!");
 
-// === Seleciona elementos ===
+// === Elementos ===
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const startBtn = document.getElementById("startBtn");
@@ -42,8 +32,10 @@ const recordeAtual = document.getElementById("recordeAtual");
 const rankingList = document.getElementById("listaRanking");
 const gameOverDiv = document.getElementById("gameOver");
 const pontuacaoFinal = document.getElementById("pontuacaoFinal");
+const voltarMenu = document.getElementById("voltarMenu");
 
-// === Ajusta o tamanho do canvas ===
+
+// === Config Canvas ===
 function ajustarCanvas() {
   const tamanho = Math.min(window.innerWidth * 0.9, 400);
   canvas.width = tamanho;
@@ -64,7 +56,7 @@ let food;
 let velocidade = 250;
 let game;
 
-// === Iniciar o jogo ===
+// === Iniciar Jogo ===
 startBtn.addEventListener("click", async () => {
   jogador = nomeInput.value.trim() || "Anônimo";
   somAtivo = somSelect.value === "on";
@@ -84,7 +76,7 @@ startBtn.addEventListener("click", async () => {
   game = setInterval(draw, velocidade);
 });
 
-// === Ver Ranking Global ===
+// === Ver Ranking (sem jogar) ===
 showRankingBtn.addEventListener("click", async () => {
   menu.style.display = "none";
   gameContainer.style.display = "flex";
@@ -93,15 +85,15 @@ showRankingBtn.addEventListener("click", async () => {
   await carregarRankingGlobal();
 });
 
-// === Direção do teclado ===
-document.addEventListener("keydown", (e) => {
+// === Direções ===
+document.addEventListener("keydown", e => {
   if (e.key === "ArrowLeft" && d !== "RIGHT") d = "LEFT";
   else if (e.key === "ArrowUp" && d !== "DOWN") d = "UP";
   else if (e.key === "ArrowRight" && d !== "LEFT") d = "RIGHT";
   else if (e.key === "ArrowDown" && d !== "UP") d = "DOWN";
 });
 
-// === Funções auxiliares ===
+// === Funções ===
 function gerarComida() {
   const maxX = Math.floor(canvas.width / box);
   const maxY = Math.floor(canvas.height / box);
@@ -116,7 +108,6 @@ function resetarJogo() {
   clearInterval(game);
 }
 
-// === Desenhar jogo ===
 function draw() {
   // fundo
   ctx.fillStyle = "#111";
@@ -128,7 +119,13 @@ function draw() {
       // cabeça
       ctx.fillStyle = "#2ecc71";
       ctx.beginPath();
-      ctx.arc(snake[i].x + box / 2, snake[i].y + box / 2, box / 2, 0, Math.PI * 2);
+      ctx.arc(
+        snake[i].x + box / 2,
+        snake[i].y + box / 2,
+        box / 2,
+        0,
+        Math.PI * 2
+      );
       ctx.fill();
 
       // olhos 🐍
@@ -138,14 +135,25 @@ function draw() {
       ctx.arc(snake[i].x + box * 0.75, snake[i].y + box * 0.25, 2, 0, Math.PI * 2);
       ctx.fill();
     } else {
-      // corpo com gradiente arredondado
-      const grad = ctx.createLinearGradient(snake[i].x, snake[i].y, snake[i].x + box, snake[i].y + box);
+      // corpo (segmentos arredondados com degradê)
+      const grad = ctx.createLinearGradient(
+        snake[i].x,
+        snake[i].y,
+        snake[i].x + box,
+        snake[i].y + box
+      );
       grad.addColorStop(0, "#27ae60");
       grad.addColorStop(1, "#145a32");
       ctx.fillStyle = grad;
 
       ctx.beginPath();
-      ctx.arc(snake[i].x + box / 2, snake[i].y + box / 2, box / 2.2, 0, Math.PI * 2);
+      ctx.arc(
+        snake[i].x + box / 2,
+        snake[i].y + box / 2,
+        box / 2.2,
+        0,
+        Math.PI * 2
+      );
       ctx.fill();
     }
   }
@@ -171,6 +179,7 @@ function draw() {
     food = gerarComida();
     if (somAtivo) somComer.play();
 
+    // aumenta a velocidade a cada 10 pontos
     if (score % 10 === 0) {
       velocidade *= 0.99;
       clearInterval(game);
@@ -178,11 +187,13 @@ function draw() {
       if (somAtivo) somBonus.play();
       flashCanvas();
     }
-  } else snake.pop();
+  } else {
+    snake.pop();
+  }
 
   const newHead = { x: snakeX, y: snakeY };
 
-  // colisão
+  // colisão com bordas ou corpo
   if (
     snakeX < 0 ||
     snakeY < 0 ||
@@ -200,17 +211,14 @@ function draw() {
   atualizarHUD();
 }
 
-// === Colisão ===
 function collision(head, array) {
-  return array.some((seg) => seg.x === head.x && seg.y === head.y);
+  return array.some(seg => seg.x === head.x && seg.y === head.y);
 }
 
-// === Atualiza HUD ===
 function atualizarHUD() {
   infoJogador.textContent = `👤 ${jogador} | 🧮 Pontos: ${score}`;
 }
 
-// === Game Over ===
 function gameOver() {
   pontuacaoFinal.textContent = `${jogador}, sua pontuação foi ${score}!`;
   gameOverDiv.style.display = "block";
@@ -230,7 +238,7 @@ async function carregarRankingGlobal() {
   const q = query(rankingRef, orderByChild("pontos"), limitToLast(50));
   const snap = await get(q);
   let lista = [];
-  if (snap.exists()) snap.forEach((c) => lista.push(c.val()));
+  if (snap.exists()) snap.forEach(c => lista.push(c.val()));
   lista.sort((a, b) => b.pontos - a.pontos);
   lista = lista.slice(0, 5);
   rankingList.innerHTML = "";
@@ -241,33 +249,21 @@ async function carregarRankingGlobal() {
   });
 }
 
-// === Reiniciar ===
 retryBtn.addEventListener("click", () => {
   gameOverDiv.style.display = "none";
   resetarJogo();
   game = setInterval(draw, velocidade);
 });
 
-// === Flash de velocidade ===
-function flashCanvas() {
-  const oldShadow = canvas.style.boxShadow;
-  const oldBorder = canvas.style.borderColor;
-  canvas.style.boxShadow = "0 0 25px #00ff99";
-  canvas.style.borderColor = "#00ff99";
-  setTimeout(() => {
-    canvas.style.boxShadow = oldShadow;
-    canvas.style.borderColor = oldBorder || "#4caf50";
-  }, 200);
-}
-
-// === Controle por toque ===
-let startX = 0, startY = 0;
-document.addEventListener("touchstart", (e) => {
+// === Controles por toque ===
+let startX = 0;
+let startY = 0;
+document.addEventListener("touchstart", e => {
   const touch = e.touches[0];
   startX = touch.clientX;
   startY = touch.clientY;
 });
-document.addEventListener("touchmove", (e) => {
+document.addEventListener("touchmove", e => {
   if (!startX || !startY) return;
   const touch = e.touches[0];
   const diffX = touch.clientX - startX;
@@ -283,3 +279,9 @@ document.addEventListener("touchmove", (e) => {
   startY = 0;
   e.preventDefault();
 });
+
+voltarMenu.addEventListener("click", () => {
+  gameContainer.style.display = "none";
+  menu.style.display = "flex";
+});
+
