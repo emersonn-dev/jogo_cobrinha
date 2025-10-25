@@ -1,20 +1,26 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🐍 Cobrinha Deluxe Global</title>
-  <link rel="stylesheet" href="css/style.css?v=5">
+
+  <!-- Fonte estilo retro -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-  <!-- MENU -->
-  <div id="menu">
-    <h1>🐍 Jogo da Cobrinha Deluxe</h1>
+  <!-- ===== MENU INICIAL ===== -->
+  <section id="menu">
+    <h1>🐍 Cobrinha Deluxe</h1>
 
-    <label>Seu nome:</label>
-    <input type="text" id="nomeJogador" placeholder="Digite seu nome..." maxlength="20">
+    <label>Nome do jogador:</label>
+    <input type="text" id="nomeJogador" placeholder="Seu nome" maxlength="20">
 
     <label>Som:</label>
     <select id="somOption">
@@ -22,33 +28,51 @@
       <option value="off">Desativado 🔇</option>
     </select>
 
-    <button id="startBtn">🎮 Jogar</button>
-    <button id="showRankingBtn">🏆 Ver Ranking</button>
-  </div>
+    <label>Música de fundo:</label>
+    <select id="musicaOption">
+      <option value="on">Ativada 🎵</option>
+      <option value="off" selected>Desativada 🔕</option>
+    </select>
 
-  <!-- JOGO -->
-  <div id="gameContainer" style="display:none;">
-    <h1 id="tituloJogo">🐍 Cobrinha Deluxe</h1>
+    <button id="startBtn">🎮 Iniciar jogo</button>
+    <button id="abrirRankingBtn">🏆 Ver Ranking</button>
+  </section>
+
+  <!-- ===== ÁREA DO JOGO ===== -->
+  <section id="gameContainer" style="display: none; flex-direction: column; align-items: center;">
+    <h2 id="tituloJogo">🐍 Cobrinha Deluxe</h2>
+
     <canvas id="game"></canvas>
 
+    <!-- HUD -->
     <div id="hud">
-      <p id="infoJogador"></p>
-      <p id="recordeAtual"></p>
+      <p id="infoJogador">👤 - | 🧮 Pontos: 0</p>
     </div>
 
+    <!-- GAME OVER BOX -->
     <div id="gameOver">
-      <h2>💀 Game Over!</h2>
+      <h2 class="gameover-title">💀 GAME OVER!</h2>
       <p id="pontuacaoFinal"></p>
-      <button id="retry">🔁 Tentar novamente</button>
-    </div>
 
+      <div class="gameover-buttons">
+        <button id="retry" class="btn-retry">🔁 Tentar novamente</button>
+        <button id="voltarMenu" class="btn-menu">🏠 Voltar ao menu</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TELA DE RANKING SEPARADA ===== -->
+  <section id="rankingTela" style="display: none; flex-direction: column; align-items: center;">
     <div id="ranking">
       <h3>🏆 Ranking Global</h3>
       <ol id="listaRanking"></ol>
-      <button id="voltarMenu">⬅️ Voltar</button>
     </div>
-  </div>
 
+    <button id="voltarJogo" class="btn-menu">⬅️ Voltar</button>
+  </section>
+
+  <!-- JS -->
   <script type="module" src="script.js"></script>
 </body>
+
 </html>
