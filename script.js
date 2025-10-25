@@ -6,9 +6,6 @@ import {
   push,
   set,
   get,
-  query,
-  orderByChild,
-  limitToLast,
 } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
 // Configuração Firebase
@@ -51,7 +48,7 @@ function ajustarCanvas() {
 ajustarCanvas();
 window.addEventListener("resize", ajustarCanvas);
 
-// === Variáveis do jogo ===
+// === Variáveis ===
 let somComer, somMorte, somBonus;
 let somAtivo = true;
 let jogador = "";
@@ -64,7 +61,7 @@ let velocidadeInicial = 250;
 let velocidade = velocidadeInicial;
 let game;
 
-// === Iniciar o Jogo ===
+// === Iniciar o jogo ===
 startBtn.addEventListener("click", async () => {
   jogador = nomeInput.value.trim() || "Anônimo";
   somAtivo = somSelect.value === "on";
@@ -101,7 +98,7 @@ document.addEventListener("keydown", (e) => {
   else if (e.key === "ArrowDown" && d !== "UP") d = "DOWN";
 });
 
-// === Gerar comida ===
+// === Funções ===
 function gerarComida() {
   const maxX = Math.floor(canvas.width / box);
   const maxY = Math.floor(canvas.height / box);
@@ -111,7 +108,6 @@ function gerarComida() {
   };
 }
 
-// === Resetar Jogo ===
 function resetarJogo() {
   snake = [{ x: 10 * box, y: 10 * box }];
   score = 0;
@@ -121,12 +117,10 @@ function resetarJogo() {
   clearInterval(game);
 }
 
-// === Loop principal do jogo ===
 function draw() {
   ctx.fillStyle = "#111";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // desenhar cobra
   for (let i = 0; i < snake.length; i++) {
     if (i === 0) {
       ctx.fillStyle = "#2ecc71";
@@ -134,7 +128,6 @@ function draw() {
       ctx.arc(snake[i].x + box / 2, snake[i].y + box / 2, box / 2, 0, Math.PI * 2);
       ctx.fill();
 
-      // olhos
       ctx.fillStyle = "#000";
       ctx.beginPath();
       ctx.arc(snake[i].x + 5, snake[i].y + 5, 2, 0, Math.PI * 2);
@@ -170,15 +163,13 @@ function draw() {
   if (d === "RIGHT") snakeX += box;
   if (d === "DOWN") snakeY += box;
 
-  // comer
   if (snakeX === food.x && snakeY === food.y) {
     score++;
     food = gerarComida();
     if (somAtivo) somComer.play();
 
-    // aumenta velocidade a cada 10 pontos (1% mais rápido)
     if (score % 10 === 0) {
-      velocidade *= 0.99;
+      velocidade *= 0.95;
       clearInterval(game);
       game = setInterval(draw, velocidade);
       if (somAtivo) somBonus.play();
@@ -190,7 +181,6 @@ function draw() {
 
   const newHead = { x: snakeX, y: snakeY };
 
-  // colisão
   if (
     snakeX < 0 ||
     snakeY < 0 ||
@@ -208,7 +198,6 @@ function draw() {
   atualizarHUD();
 }
 
-// === Verificações ===
 function collision(head, array) {
   return array.some((seg) => seg.x === head.x && seg.y === head.y);
 }
@@ -217,7 +206,6 @@ function atualizarHUD() {
   infoJogador.textContent = `👤 ${jogador} | 🧮 Pontos: ${score}`;
 }
 
-// === Game Over ===
 async function gameOver() {
   pontuacaoFinal.textContent = `${jogador}, sua pontuação foi ${score}!`;
   gameOverDiv.style.display = "block";
@@ -225,51 +213,55 @@ async function gameOver() {
   await carregarRankingGlobal();
 }
 
-// === Ranking Firebase ===
+// === Firebase Ranking ===
 async function salvarRankingGlobal(nome, pontos) {
   const dataAgora = new Date().toLocaleString("pt-BR");
   const rankingRef = ref(db, "ranking");
-  const novoRef = push(rankingRef);
-  return set(novoRef, { nome, pontos, data: dataAgora });
-}
 
-async function carregarRankingGlobal() {
-  try {
-    const rankingRef = ref(db, "ranking");
-    const snap = await get(rankingRef);
+  const snap = await get(rankingRef);
+  let jaExiste = null;
 
-    if (!snap.exists()) {
-      rankingList.innerHTML = "<li>Nenhum jogador ainda 🐍</li>";
-      return;
-    }
-
-    // Pegar todos e ordenar manualmente
-    const lista = [];
-    snap.forEach(c => {
-      const val = c.val();
-      if (val && typeof val.pontos === "number") {
-        lista.push(val);
+  if (snap.exists()) {
+    snap.forEach((child) => {
+      const val = child.val();
+      if (val.nome === nome) {
+        jaExiste = { id: child.key, ...val };
       }
     });
+  }
 
-    // Ordenar manualmente (maior pontuação primeiro)
-    lista.sort((a, b) => b.pontos - a.pontos);
-
-    // Mostrar os 10 melhores
-    const top = lista.slice(0, 10);
-    rankingList.innerHTML = "";
-
-    top.forEach((r, i) => {
-      const li = document.createElement("li");
-      li.textContent = `${i + 1}. ${r.nome} - ${r.pontos} pts (${r.data})`;
-      rankingList.appendChild(li);
-    });
-  } catch (e) {
-    console.error("Erro ao carregar ranking:", e);
-    rankingList.innerHTML = "<li>Erro ao carregar ranking 😢</li>";
+  if (jaExiste) {
+    if (pontos > jaExiste.pontos) {
+      const jogadorRef = ref(db, `ranking/${jaExiste.id}`);
+      await set(jogadorRef, { nome, pontos, data: dataAgora });
+    }
+  } else {
+    const novoRef = push(rankingRef);
+    await set(novoRef, { nome, pontos, data: dataAgora });
   }
 }
 
+async function carregarRankingGlobal() {
+  const rankingRef = ref(db, "ranking");
+  const snap = await get(rankingRef);
+  const lista = [];
+
+  if (snap.exists()) {
+    snap.forEach((child) => {
+      const val = child.val();
+      if (val && typeof val.pontos === "number") lista.push(val);
+    });
+  }
+
+  lista.sort((a, b) => b.pontos - a.pontos);
+  rankingList.innerHTML = "";
+
+  lista.slice(0, 10).forEach((r, i) => {
+    const li = document.createElement("li");
+    li.textContent = `${i + 1}. ${r.nome} - ${r.pontos} pts (${r.data})`;
+    rankingList.appendChild(li);
+  });
+}
 
 // === Botões ===
 retryBtn.addEventListener("click", () => {
@@ -285,8 +277,7 @@ voltarMenu.addEventListener("click", () => {
 });
 
 // === Toque (celular) ===
-let startX = 0;
-let startY = 0;
+let startX = 0, startY = 0;
 document.addEventListener("touchstart", (e) => {
   const touch = e.touches[0];
   startX = touch.clientX;
@@ -297,6 +288,7 @@ document.addEventListener("touchmove", (e) => {
   const touch = e.touches[0];
   const diffX = touch.clientX - startX;
   const diffY = touch.clientY - startY;
+
   if (Math.abs(diffX) > Math.abs(diffY)) {
     if (diffX > 0 && d !== "LEFT") d = "RIGHT";
     else if (diffX < 0 && d !== "RIGHT") d = "LEFT";
@@ -304,6 +296,7 @@ document.addEventListener("touchmove", (e) => {
     if (diffY > 0 && d !== "UP") d = "DOWN";
     else if (diffY < 0 && d !== "DOWN") d = "UP";
   }
+
   startX = 0;
   startY = 0;
   e.preventDefault();
@@ -317,4 +310,3 @@ function flashCanvas() {
     canvas.style.boxShadow = oldShadow;
   }, 200);
 }
-
