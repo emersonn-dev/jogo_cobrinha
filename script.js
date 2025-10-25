@@ -234,20 +234,42 @@ async function salvarRankingGlobal(nome, pontos) {
 }
 
 async function carregarRankingGlobal() {
-  const rankingRef = ref(db, "ranking");
-  const q = query(rankingRef, orderByChild("pontos"), limitToLast(50));
-  const snap = await get(q);
-  let lista = [];
-  if (snap.exists()) snap.forEach((c) => lista.push(c.val()));
-  lista.sort((a, b) => b.pontos - a.pontos);
-  lista = lista.slice(0, 5);
-  rankingList.innerHTML = "";
-  lista.forEach((r, i) => {
-    const li = document.createElement("li");
-    li.textContent = `${i + 1}. ${r.nome} - ${r.pontos} pts (${r.data})`;
-    rankingList.appendChild(li);
-  });
+  try {
+    const rankingRef = ref(db, "ranking");
+    const snap = await get(rankingRef);
+
+    if (!snap.exists()) {
+      rankingList.innerHTML = "<li>Nenhum jogador ainda 🐍</li>";
+      return;
+    }
+
+    // Pegar todos e ordenar manualmente
+    const lista = [];
+    snap.forEach(c => {
+      const val = c.val();
+      if (val && typeof val.pontos === "number") {
+        lista.push(val);
+      }
+    });
+
+    // Ordenar manualmente (maior pontuação primeiro)
+    lista.sort((a, b) => b.pontos - a.pontos);
+
+    // Mostrar os 10 melhores
+    const top = lista.slice(0, 10);
+    rankingList.innerHTML = "";
+
+    top.forEach((r, i) => {
+      const li = document.createElement("li");
+      li.textContent = `${i + 1}. ${r.nome} - ${r.pontos} pts (${r.data})`;
+      rankingList.appendChild(li);
+    });
+  } catch (e) {
+    console.error("Erro ao carregar ranking:", e);
+    rankingList.innerHTML = "<li>Erro ao carregar ranking 😢</li>";
+  }
 }
+
 
 // === Botões ===
 retryBtn.addEventListener("click", () => {
@@ -295,3 +317,4 @@ function flashCanvas() {
     canvas.style.boxShadow = oldShadow;
   }, 200);
 }
+
