@@ -117,6 +117,26 @@ canvas {
   box-shadow: 0 0 20px #00ff99;
 }
 
+#voltarMenu {
+  background: #00ff99;
+  border: none;
+  padding: 10px 20px;
+  color: #000;
+  font-family: "Press Start 2P";
+  font-size: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 20px #00ff99;
+  transition: 0.2s;
+  margin-top: 15px;
+}
+
+#voltarMenu:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px #00ff99;
+}
+
+
 #ranking ol {
   list-style: none;
   padding: 0;
