@@ -256,7 +256,7 @@ async function carregarRankingGlobal() {
   lista.sort((a, b) => b.pontos - a.pontos);
   rankingList.innerHTML = "";
 
-  lista.slice(0, 10).forEach((r, i) => {
+  lista.slice(0, 5).forEach((r, i) => {
     const li = document.createElement("li");
     li.textContent = `${i + 1}. ${r.nome} - ${r.pontos} pts (${r.data})`;
     rankingList.appendChild(li);
@@ -310,3 +310,4 @@ function flashCanvas() {
     canvas.style.boxShadow = oldShadow;
   }, 200);
 }
+
