@@ -16,16 +16,28 @@ body {
   flex-direction: column;
   min-height: 100vh;
   text-align: center;
-  overflow: hidden; /* evita rolagem no celular */
+  overflow: hidden;
+  /* evita rolagem no celular */
 }
 
-/* === Títulos === */
-h1, h2, h3 {
+/* === Títulos padrão (verde neon) === */
+h1,
+h2,
+h3 {
   text-shadow: 0 0 10px #00ff99;
   margin-bottom: 10px;
+  color: #fff;
 }
 
-/* === Botões === */
+/* Título especial do GAME OVER */
+.gameover-title {
+  color: #ff3b3b;
+  text-shadow: 0 0 8px #ff3b3b, 0 0 16px #ff0000, 0 0 28px #ff0000;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+/* === Botões base === */
 button {
   background-color: #00ff99;
   border: none;
@@ -46,8 +58,30 @@ button:hover {
   box-shadow: 0 0 15px #00ff99;
 }
 
+/* Botão verde / voltar menu */
+.btn-menu {
+  background: #00ff99;
+  color: #000;
+  box-shadow: 0 0 20px #00ff99;
+  border-radius: 8px;
+  font-size: 10px;
+}
+
+/* Botão vermelho / tentar novamente */
+.btn-retry {
+  background-color: #e74c3c;
+  color: #fff;
+  box-shadow: 0 0 10px #e74c3c;
+}
+
+.btn-retry:hover {
+  background-color: #ff6b6b;
+  box-shadow: 0 0 15px #ff6b6b;
+}
+
 /* === Inputs e selects === */
-input, select {
+input,
+select {
   background-color: #111;
   color: #00ff99;
   border: 2px solid #00ff99;
@@ -81,7 +115,8 @@ canvas {
   box-shadow: 0 0 25px #00ff99;
   background-color: #111;
   margin: 20px 0;
-  touch-action: none; /* bloqueia gestos nativos */
+  touch-action: none;
+  /* bloqueia gestos nativos */
 }
 
 /* === HUD === */
@@ -92,7 +127,7 @@ canvas {
   text-shadow: 0 0 8px #00ff99;
 }
 
-/* === Game Over === */
+/* === Caixa de Game Over === */
 #gameOver {
   display: none;
   background-color: rgba(0, 0, 0, 0.8);
@@ -105,61 +140,58 @@ canvas {
   max-width: 400px;
 }
 
-/* === Ranking === */
+#pontuacaoFinal {
+  font-size: 10px;
+  color: #fff;
+  margin-bottom: 15px;
+  line-height: 1.5;
+  text-shadow: 0 0 10px #ffffff33;
+}
+
+/* Botões dentro do Game Over */
+.gameover-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* === Ranking Screen === */
+#rankingTela {
+  width: 90%;
+  max-width: 400px;
+}
+
 #ranking {
   margin-top: 15px;
   background-color: rgba(0, 0, 0, 0.8);
   border: 2px solid #00ff99;
   border-radius: 12px;
   padding: 10px;
-  width: 90%;
-  max-width: 350px;
+  width: 100%;
   box-shadow: 0 0 20px #00ff99;
 }
 
-#voltarMenu {
-  background: #00ff99;
-  border: none;
-  padding: 10px 20px;
-  color: #000;
-  font-family: "Press Start 2P";
+#ranking h3 {
+  color: #fff;
+  text-shadow: 0 0 10px #00ff99;
   font-size: 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 0 20px #00ff99;
-  transition: 0.2s;
-  margin-top: 15px;
+  margin-bottom: 10px;
 }
 
-#voltarMenu:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 30px #00ff99;
-}
-
-
-#ranking ol {
+#listaRanking {
   list-style: none;
   padding: 0;
   margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
 }
 
-#ranking li {
+#listaRanking li {
   margin: 5px 0;
   font-size: 10px;
   color: #00ff99;
   text-shadow: 0 0 8px #00ff99;
-}
-
-/* === Botão de voltar ao menu === */
-#retry {
-  background-color: #e74c3c;
-  color: #fff;
-  box-shadow: 0 0 10px #e74c3c;
-}
-
-#retry:hover {
-  background-color: #ff6b6b;
-  box-shadow: 0 0 15px #ff6b6b;
 }
 
 /* === Responsividade === */
@@ -169,7 +201,9 @@ canvas {
     padding: 10px;
   }
 
-  button, input, select {
+  button,
+  input,
+  select {
     font-size: 9px;
     padding: 8px;
   }
@@ -179,7 +213,17 @@ canvas {
     height: 90vw;
   }
 
-  #menu, #ranking, #gameOver {
+  #menu,
+  #ranking,
+  #gameOver {
     width: 95%;
+  }
+
+  .gameover-buttons {
+    flex-direction: column;
+  }
+
+  .gameover-buttons button {
+    width: 100%;
   }
 }
